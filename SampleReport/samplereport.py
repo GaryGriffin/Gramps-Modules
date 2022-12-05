@@ -59,6 +59,7 @@ from gramps.gen.display.place import displayer as place_displayer
 from gramps.gen.utils.db import get_birth_or_fallback, get_death_or_fallback
 from gramps.gen.utils.alive import probably_alive, probably_alive_range
 
+import form
 from gramps.gen.const import (PROGRAM_NAME, VERSION)
 import time
 #------------------------------------------------------------------------
@@ -292,7 +293,8 @@ class SampleReport(Report):
                     if place_handle:
                         place = self.database.get_place_from_handle(place_handle)
                         if place:
-                            place_title = place_displayer.display(self.database, place)
+                            bd_date = bd_event.get_date_object().to_calendar("gregorian")
+                            place_title = place_displayer.display(self.database, place, bd_date)
                             if place_title != "":
                                 primary_cit = 0
                                 secondary_cit = 0
@@ -305,7 +307,6 @@ class SampleReport(Report):
                                             if event.type in secondary_event:
                                                 secondary_cit += len(event.get_citation_list())
                                 cits = "{0} + {1}".format( primary_cit, secondary_cit)
-                                bd_date = bd_event.get_date_object().to_calendar("gregorian")
                                 if (bd_date and bd_date.get_valid() and not bd_date.is_empty()):
                                     date_str = "%s" % get_date(bd_event)
                                     reportRows.append([place_title, date_str, person.get_gramps_id(), _nd.display(person), cits])
