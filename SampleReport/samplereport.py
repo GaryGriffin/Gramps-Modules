@@ -294,6 +294,7 @@ class SampleReport(Report):
                         place = self.database.get_place_from_handle(place_handle)
                         if place:
                             bd_date = bd_event.get_date_object().to_calendar("gregorian")
+#    Get the Place title based on the date of the event
                             place_title = place_displayer.display(self.database, place, bd_date)
                             if place_title != "":
                                 primary_cit = 0
