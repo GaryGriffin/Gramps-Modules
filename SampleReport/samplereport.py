@@ -59,7 +59,7 @@ from gramps.gen.display.place import displayer as place_displayer
 from gramps.gen.utils.db import get_birth_or_fallback, get_death_or_fallback
 from gramps.gen.utils.alive import probably_alive, probably_alive_range
 
-import form
+#import form
 from gramps.gen.const import (PROGRAM_NAME, VERSION)
 import time
 #------------------------------------------------------------------------
