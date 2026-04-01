@@ -183,27 +183,38 @@ class SampleReport(Report):
     #
     #    Traverse Person list
     #
-        cursor = self.database.get_person_cursor()
-
-        data = cursor.first()
-        while data:
-            person = Person()
-            person.unserialize(data[1])
+        for entry in self.database.get_person_cursor():
+            handle = entry[0]
+            person = self.database.get_person_from_handle(handle)
             attrs = person.get_attribute_list()
             for attr in attrs:
                 if attr.get_type() != "_UID":
                     reportRows.append(["Person",person.get_gramps_id(),attr.get_type().type2base(),attr.get_value(),_nd.display(person)])
-            data = cursor.next()
-        cursor.close()
+    #
+    #    Traverse all events of person
+    #
+            for event_ref in person.get_event_ref_list():
+                event_handle = event_ref.ref
+                event = self.database.get_event_from_handle(event_handle)
+                attrs = event.get_attribute_list()
+                etype = event.get_type()
+                for attr in attrs:
+                    reportRows.append(["Person Event - " + etype.string,event.get_gramps_id(),attr.get_type().type2base(),attr.get_value(),event.get_description()])
+    #
+    #   Traverse all media of person
+    #
+            for media_ref in person.get_media_list():
+                media_handle = media_ref.get_reference_handle()
+                media = self.database.get_media_from_handle(media_handle)
+                attrs = media.get_attribute_list()
+                for attr in attrs:
+                    reportRows.append(["Person Media - ",media.get_gramps_id(),attr.get_type().type2base(),attr.get_value(),media.get_description()])
     #
     #    Traverse Family list
     #
-        cursor = self.database.get_family_cursor()
-
-        data = cursor.first()
-        while data:
-            family = Family()
-            family.unserialize(data[1])
+        for entry in self.database.get_family_cursor() :
+            handle = entry[0]
+            family = self.database.get_family_from_handle(handle)
             attrs = family.get_attribute_list()
             for attr in attrs:
                 mother = ""
@@ -214,38 +225,25 @@ class SampleReport(Report):
                     father = _nd.display(self.database.get_person_from_handle(family.get_father_handle()))
                 if attr.get_type() != "_UID":
                     reportRows.append(["Family",family.get_gramps_id(),attr.get_type().type2base(),attr.get_value(),father + " / " + mother])
-            data = cursor.next()
-        cursor.close()
     #
-    #    Traverse Event list
+    #    Traverse all events of family
     #
-        cursor = self.database.get_event_cursor()
-
-        data = cursor.first()
-        while data:
-            event = Event()
-            event.unserialize(data[1])
-            attrs = event.get_attribute_list()
-            etype = event.get_type()
-            for attr in attrs:
-                reportRows.append(["Event - " + etype.string,event.get_gramps_id(),attr.get_type().type2base(),attr.get_value(),event.get_description()])
-            data = cursor.next()
-        cursor.close()
+            for event_ref in family.get_event_ref_list():
+                event_handle = event_ref.ref
+                event = self.database.get_event_from_handle(event_handle)
+                attrs = event.get_attribute_list()
+                etype = event.get_type()
+                for attr in attrs:
+                    reportRows.append(["Family Event - " + etype.string,event.get_gramps_id(),attr.get_type().type2base(),attr.get_value(),event.get_description()])
     #
-    #    Traverse Media list
+    #   Traverse all media of family
     #
-        cursor = self.database.get_media_cursor()
-    
-        data = cursor.first()
-        while data:
-            media = Media()
-            media.unserialize(data[1])
-            attrs = media.get_attribute_list()
-            for attr in attrs:
-                reportRows.append(["Media",media.get_gramps_id(),attr.get_type().type2base(),attr.get_value(),media.get_description()])
-            data = cursor.next()
-        cursor.close()
-
+            for media_ref in family.get_media_list():
+                media_handle = media_ref.get_reference_handle()
+                media = self.database.get_media_from_handle(media_handle)
+                attrs = media.get_attribute_list()
+                for attr in attrs:
+                    reportRows.append(["Family Media - ",media.get_gramps_id(),attr.get_type().type2base(),attr.get_value(),media.get_description()])
         reportRowsSorted = sorted (reportRows, reverse = False)
         return reportRowsSorted
 
