@@ -19,8 +19,11 @@
 #
 
 """
+
 ConvertDNA Gramplet
 This Gramplet converts Notes in Associations to DNATest and DNAMatch objects
+It does NOT include converting Notes on Citations in Associations
+
 """
 #-------------------------------------------------------------------------
 #
@@ -36,15 +39,11 @@ This Gramplet converts Notes in Associations to DNATest and DNAMatch objects
 #------------------------------------------------------------------------
 
 from gramps.gui.plug import tool
-from gramps.gen.lib import DNATest, DNAMatch, DNASegment
-from gramps.gen.const import GRAMPS_LOCALE as glocale
-from gramps.gen.db import DbTxn
 from gramps.gui.managedwindow import ManagedWindow
+from gramps.gen.lib import DNATest, DNAMatch, DNASegment
+from gramps.gen.db import DbTxn
+from gramps.gen.const import GRAMPS_LOCALE as glocale
 
-from gramps.gen.display.name import displayer as _nd
-
-import re
-import csv
 import os
 _ = glocale.translation.gettext
 
@@ -52,13 +51,11 @@ class ConvertDNA(ManagedWindow):
     def __init__(self, dbstate, user, options_class, name, callback=None):
         uistate = user.uistate
         self.dbstate = dbstate
-        self.uistate = uistate # ADDED
+        self.uistate = uistate
         self.db = dbstate.db
-        active_handle = self.uistate.get_active("Person") # ADDED
-#        active = self.db.get_person_from_gramps_id("I00001")
-#        active_handle = active.get_handle()
         association_string = "DNA"
-        include_citation_notes = False
+        active_handle = self.uistate.get_active("Person")
+
         if active_handle:
             active = self.db.get_person_from_handle(active_handle)
 # Create active DNATest as autosomal
@@ -121,8 +118,9 @@ class ConvertDNA(ManagedWindow):
                                 if len(field) == 1:
                                     try:
                                         shared_cm = float(field[0])
-                                        match_dnatest.set_provider("AncestryDNA")
-                                        self._add_DNATest(match_dnatest)
+                                        if provider != "AncestryDNA":
+                                            match_dnatest.set_provider("AncestryDNA")
+                                            self._add_DNATest(match_dnatest)
                                     except:
                                         continue
                         dnamatch.set_shared_cm(shared_cm)
@@ -133,42 +131,7 @@ class ConvertDNA(ManagedWindow):
                         for citation_handle in assoc.get_citation_list() :
                             dnamatch.add_citation(citation_handle)
                         self._add_DNAMatch(dnamatch)
-                # Get Notes attached to Citation which is attached to the Association
-                    if include_citation_notes :
-                        for citation_handle in assoc.get_citation_list():
-                            citation = self.db.get_citation_from_handle(citation_handle)
-#Create DNAMatch
-                            dnamatch = DNAMatch()
-                            segment_list = []
-                            dnamatch.set_segment_list(segment_list)
-                            segment_list = dnamatch.get_segment_list()
-                            segment_count = 0
-                            largest_cm = 0
-                            for handle in citation.get_note_list():
-                                note = self.db.get_note_from_handle(handle)
-                                for line in note.get().split('\n'):
-#Create DNAMatch Segment
-                                    segment = self._create_segment(line)
-                                    if segment:
-                                        segment_count += 1
-                                        largest_cm = max(largest_cm, segment.get_shared_cm())
-                                        shared_cm += segment.get_shared_cm()
-                                        dnamatch.add_segment(segment)
-                                    else: # check for single number in line (Ancestry shared cM case)
-                                        field = line.split(',')
-                                        if len(field) == 1:
-                                            try:
-                                                shared_cm = float(field[0])
-                                            except:
-                                                shared_cm = 0
-                                            match_dnatest.set_provider("AncestryDNA")
-                                            self._add_DNATest(match_dnatest)
-                                dnamatch.set_shared_cm(shared_cm)
-                                dnamatch.set_subject_test_handle(active_dnatest.get_handle())
-                                dnamatch.set_match_test_handle(match_dnatest.get_handle())
-                                dnamatch.set_segment_count(segment_count)
-                                dnamatch.set_largest_segment_cm(largest_cm)
-                                self._add_DNAMatch(dnamatch)
+
     def _add_DNATest(self,obj):
         if not obj.handle:
             with DbTxn(
@@ -176,13 +139,12 @@ class ConvertDNA(ManagedWindow):
             ) as trans:
                 self.db.add_dnatest(obj, trans)
         else:
-            if True:
-                with DbTxn(
-                    _("Edit DNA Test (%s)") % obj.get_gramps_id(), self.db
-                ) as trans:
-                    if not obj.get_gramps_id():
-                        obj.set_gramps_id(self.db.find_next_dnatest_gramps_id())
-                    self.db.commit_dnatest(obj, trans)
+            with DbTxn(
+                _("Edit DNA Test (%s)") % obj.get_gramps_id(), self.db
+            ) as trans:
+                if not obj.get_gramps_id():
+                    obj.set_gramps_id(self.db.find_next_dnatest_gramps_id())
+                self.db.commit_dnatest(obj, trans)
 
     def _add_DNAMatch(self,obj):
         if not obj.handle:
@@ -191,13 +153,13 @@ class ConvertDNA(ManagedWindow):
             ) as trans:
                 self.db.add_dnamatch(obj, trans)
         else:
-            if self.data_has_changed():
-                with DbTxn(
-                    _("Edit DNA Match (%s)") % obj.get_gramps_id(), self.db
-                ) as trans:
-                    if not obj.get_gramps_id():
-                        obj.set_gramps_id(self.db.find_next_dnamatch_gramps_id())
-                    self.db.commit_dnamatch(obj, trans)
+            with DbTxn(
+                _("Edit DNA Match (%s)") % obj.get_gramps_id(), self.db
+            ) as trans:
+                if not obj.get_gramps_id():
+                    obj.set_gramps_id(self.db.find_next_dnamatch_gramps_id())
+                self.db.commit_dnamatch(obj, trans)
+
     def _create_segment(self,line):
         if "\t" in line:
 # Tabs are the field separators. Now determine THOUSEP and RADIXCHAR. Use Field 2 (Stop Pos) to see if there are THOUSEP there. Use Field 3 (SNPs) to see if there is a radixchar
