@@ -1,0 +1,16 @@
+register(
+    TOOL,
+    id="MyHeritage DNA Import Tool",
+    name=_("MyHeritage DNA"),
+    description=_("Tool to import DNA data from My Heritage"),
+    status=STABLE,
+    audience=EXPERT,
+    version = '1.0.34',
+    gramps_target_version="6.1",
+    fname="myheritage_import.py",
+    category=TOOL_UTILS,
+    toolclass="MyHeritageFinder",
+    optionclass="MyHeritageOptions",
+    tool_modes=[TOOL_MODE_GUI, TOOL_MODE_CLI],
+    help_url="Addon:MyHeritage_DNA",
+)

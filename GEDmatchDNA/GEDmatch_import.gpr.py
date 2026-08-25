@@ -1,0 +1,16 @@
+register(
+    TOOL,
+    id="GEDmatch DNA Import Tool",
+    name=_("GEDmatch DNA"),
+    description=_("Tool to import DNA data from GEDmatch"),
+    status=STABLE,
+    audience=EXPERT,
+    version = '1.0.34',
+    gramps_target_version="6.1",
+    fname="GEDmatch_import.py",
+    category=TOOL_UTILS,
+    toolclass="GEDmatchFinder",
+    optionclass="GEDmatchOptions",
+    tool_modes=[TOOL_MODE_GUI, TOOL_MODE_CLI],
+    help_url="Addon:GEDmatch_DNA",
+)

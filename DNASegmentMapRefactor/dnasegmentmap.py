@@ -46,7 +46,7 @@ from gramps.gen.const import GRAMPS_LOCALE as glocale
 from gramps.gen.utils.grampslocale import GrampsLocale
 from gramps.gen.config import config
 from gramps.gen.relationship import get_relationship_calculator
-from gramps.gen.plug.menu import EnumeratedListOption, BooleanOption
+from gramps.gen.plug.menu import EnumeratedListOption, BooleanOption, NumberOption
 
 import random
 import re
@@ -110,6 +110,7 @@ class DNASegmentMap(Gramplet):
         self.show_centromere = True
         self.show_associate_id = False
         self.show_all_matches = False
+        self.min_cM_threshold = 0
 
     def build_options(self):
         """Build the configuration options"""
@@ -121,6 +122,7 @@ class DNASegmentMap(Gramplet):
         self.add_option( BooleanOption(_("Show Centromere"), self.show_centromere))
         self.add_option( BooleanOption(_("Show Associate ID"), self.show_associate_id))
         self.add_option( BooleanOption(_("Include not in existing tree"), self.show_all_matches))
+        self.add_option( NumberOption(_("Min cM threshold"), self.min_cM_threshold, 0, 3000))
 
     def save_options(self):
         """Save gramplet configuration data"""
@@ -128,20 +130,22 @@ class DNASegmentMap(Gramplet):
         self.show_centromere = self.get_option(_("Show Centromere")).get_value()
         self.show_associate_id = self.get_option(_("Show Associate ID")).get_value()
         self.show_all_matches = self.get_option(_("Include not in existing tree")).get_value()
+        self.min_cM_threshold = self.get_option(_("Min cM threshold")).get_value()
 
     def save_update_options(self, obj):
         """Save a gramplet's options to file"""
         self.save_options()
-        self.gui.data = [self.source_mode, self.show_centromere, self.show_associate_id, self.show_all_matches]
+        self.gui.data = [self.source_mode, self.show_centromere, self.show_associate_id, self.show_all_matches, self.min_cM_threshold]
         self.update()
 
     def on_load(self):
         """Load stored configuration data"""
-        if len(self.gui.data) == 4:
+        if len(self.gui.data) == 5:
             self.source_mode = self.gui.data[0]
             self.show_centromere = self.gui.data[1]
             self.show_associate_id = self.gui.data[2]
             self.show_all_matches = self.gui.data[3]
+            self.min_cM_threshold = int(self.gui.data[4])
 
     def db_changed(self):
         self.connect(self.dbstate.db, 'person-add', self.update)
@@ -168,125 +172,122 @@ class DNASegmentMap(Gramplet):
         """Process input config and input data"""
         for widget in self.vbox.get_children():
             self.vbox.remove(widget)
-        segmap = SegmentMap()
-        segmap.show_centromere = self.show_centromere
-        segmap.show_assoc_id = self.show_associate_id
+        segmap = self._init_segmap()
         if self.source_mode == "Notes": self._process_notes(segmap)
         if self.source_mode == "DNA":   self._process_DNASegments(segmap)
 
+    def _init_segmap(self):
+        segmap = SegmentMap()
+        segmap.show_centromere = self.show_centromere
+        segmap.show_assoc_id = self.show_associate_id
+        active_handle = self.get_active('Person')
+        if not active_handle: return None
+        active = self.dbstate.db.get_person_from_handle(active_handle)
+        self.relationship = get_relationship_calculator(glocale)
+        segmap.connect('clicked', self.update)
+        segmap.dbstate = self.dbstate
+        segmap.uistate = self.uistate
+        segmap.segments = []
+        segmap.gender = active.gender
+        segmap.active = active
+        segmap.relationship = self.relationship
+        segmap.grandparent_depth = segmap._config.get('map.grandparent-view')
+        return segmap
+    
     def _process_notes(self, segmap):
         """Process Association Notes option"""
         association_string = "DNA"
         active_handle = self.get_active('Person')
-        if active_handle:
-            active = self.dbstate.db.get_person_from_handle(active_handle)
-            self.relationship = get_relationship_calculator(glocale)
-            segmap.connect('clicked', self.update)
-            segmap.dbstate = self.dbstate
-            segmap.uistate = self.uistate
-            segmap.segments = []
-            segmap.gender = active.gender
-            segmap.active = active
-            segmap.relationship = self.relationship
-            include_citation_notes = segmap._config.get('map.include-citation-notes')
-            segmap.grandparent_depth = segmap._config.get('map.grandparent-view')
-        # Traverse all Associations
-            for assoc in active.get_person_ref_list():
-                if assoc.get_relation() == association_string:
-                    associate = self.dbstate.db.get_person_from_handle(assoc.ref)
-                    random.seed(associate.get_gramps_id())   # Set color to value based on Associate handle
-                    rgb_color = [random.random(),random.random(),random.random()]
-                    side = self._get_chromosome_side(active,associate)
-            # Get Notes attached to Association
-                    for handle in assoc.get_note_list():
-                        note = self.dbstate.db.get_note_from_handle(handle)
-                        for line in note.get().split('\n'):
-                            assoc_handle = assoc.ref
-                            self._write_notes_chromo(line, side, rgb_color, assoc, note, segmap)
-            # Get Notes attached to Citation which is attached to the Association
-                    if include_citation_notes :
-                        for citation_handle in assoc.get_citation_list():
-                            citation = self.dbstate.db.get_citation_from_handle(citation_handle)
-                            for handle in citation.get_note_list():
-                                note = self.dbstate.db.get_note_from_handle(handle)
-                                for line in note.get().split('\n'):
-                                    assoc_handle = assoc.ref
-                                    self._write_notes_chromo(line, side, rgb_color, assoc, note, segmap)
-        # Draw map
-            if len(segmap.segments) > 0:
-                segmentsSorted = sorted(segmap.segments,reverse=True, key=itemgetter(4))
-                segmap.segments = segmentsSorted
-                segmap.show()
-                self.vbox.pack_start(segmap, True, True, 0)
+        if not active_handle: return
+        active = self.dbstate.db.get_person_from_handle(active_handle)
+        include_citation_notes = segmap._config.get('map.include-citation-notes')
+# Traverse all Associations
+        for assoc in active.get_person_ref_list():
+            if assoc.get_relation() == association_string:
+                associate = self.dbstate.db.get_person_from_handle(assoc.ref)
+                random.seed(associate.get_gramps_id())   # Set color to value based on Associate handle
+                rgb_color = [random.random(),random.random(),random.random()]
+                side = self._get_chromosome_side(active,associate)
+        # Get Notes attached to Association
+                for handle in assoc.get_note_list():
+                    note = self.dbstate.db.get_note_from_handle(handle)
+                    for line in note.get().split('\n'):
+                        assoc_handle = assoc.ref
+                        self._write_notes_chromo(line, side, rgb_color, assoc, note, segmap)
+        # Get Notes attached to Citation which is attached to the Association (optionally)
+                if include_citation_notes :
+                    for citation_handle in assoc.get_citation_list():
+                        citation = self.dbstate.db.get_citation_from_handle(citation_handle)
+                        for handle in citation.get_note_list():
+                            note = self.dbstate.db.get_note_from_handle(handle)
+                            for line in note.get().split('\n'):
+                                assoc_handle = assoc.ref
+                                self._write_notes_chromo(line, side, rgb_color, assoc, note, segmap)
+    # Sort based on total cM and Draw map
+        if len(segmap.segments) > 0:
+            segmentsSorted = sorted(segmap.segments,reverse=True, key=itemgetter(4))
+            segmap.segments = segmentsSorted
+            segmap.show()
+            self.vbox.pack_start(segmap, True, True, 0)
 
     def _process_DNASegments(self,segmap) :
         """Process DNASegment option"""
         active_handle = self.get_active('Person')
-        if active_handle:
-            selected = self.dbstate.db.get_person_from_handle(active_handle)
-            self.relationship = get_relationship_calculator(glocale)
-            segmap.connect('clicked', self.update)
-            segmap.dbstate = self.dbstate
-            segmap.uistate = self.uistate
-            segmap.segments = []
-            segmap.gender = selected.gender
-            segmap.active = selected
-            segmap.relationship = self.relationship
-            segmap.grandparent_depth = segmap._config.get('map.grandparent-view')
-#
-            active_test_handles = self.dbstate.db.find_backlink_handles(active_handle, ["DNATest"])
-            for class_name_test, active_test_handle in active_test_handles:
-                active_match_handles = self.dbstate.db.find_backlink_handles(active_test_handle, ["DNAMatch"])
-                for class_name_match, handle in active_match_handles:
-#                for all DNATest of active, traverse all DNAMatches
-                    dnamatch = self.dbstate.db.get_dnamatch_from_handle(handle)
-                    subject_handle = dnamatch.get_subject_test_handle()
-                    SubjectTest = self.dbstate.db.get_dnatest_from_handle(subject_handle)
-                    Subject_Account_Name = SubjectTest.get_account_name()
-                    SubjectPerson = self.dbstate.db.get_person_from_handle(SubjectTest.get_person_handle())
-                    if Subject_Account_Name == '':
-                        Subject_Account_Name = _nd.display(SubjectPerson)
-                    match_handle = dnamatch.get_match_test_handle()
-                    MatchTest = self.dbstate.db.get_dnatest_from_handle(match_handle)
-                    Match_Account_Name = MatchTest.get_account_name()
-                    if MatchTest.get_person_handle() : 
-                        MatchPerson = self.dbstate.db.get_person_from_handle(MatchTest.get_person_handle())
+        if not active_handle: return
+        selected = self.dbstate.db.get_person_from_handle(active_handle)
+        active_test_handles = self.dbstate.db.find_backlink_handles(active_handle, ["DNATest"])
+        for class_name_test, active_test_handle in active_test_handles:
+            active_match_handles = self.dbstate.db.find_backlink_handles(active_test_handle, ["DNAMatch"])
+            for class_name_match, handle in active_match_handles:
+# for all DNATest of active, traverse all their DNAMatches
+                dnamatch = self.dbstate.db.get_dnamatch_from_handle(handle)
+                subject_handle = dnamatch.get_subject_test_handle()
+                if not subject_handle : continue  # Subject in None - should not happen. If so, skip to next match handle
+                SubjectTest = self.dbstate.db.get_dnatest_from_handle(subject_handle)
+                Subject_Account_Name = SubjectTest.get_account_name()
+                SubjectPerson = self.dbstate.db.get_person_from_handle(SubjectTest.get_person_handle())
+                if Subject_Account_Name == '':
+                    Subject_Account_Name = _nd.display(SubjectPerson)
+                match_handle = dnamatch.get_match_test_handle()
+                MatchTest = self.dbstate.db.get_dnatest_from_handle(match_handle)
+                Match_Account_Name = MatchTest.get_account_name()
+                if MatchTest.get_person_handle() : 
+                    MatchPerson = self.dbstate.db.get_person_from_handle(MatchTest.get_person_handle())
+                else:
+                    MatchPerson = None
+                associate=None
+                active=None
+                do_non_person = True
+# If the DNAMatch has a segment list and the shared cM is greater than threshold, draw it
+                if dnamatch and dnamatch.get_segment_list() and SubjectPerson and (self.min_cM_threshold < dnamatch.get_shared_cm()):
+                    id1 = SubjectPerson
+                    id2 = MatchPerson
+                    if MatchPerson:
+                        if selected.get_gramps_id() == id1.get_gramps_id() :
+                            associate = id2
+                            active = id1
+                        elif selected.get_gramps_id() == id2.get_gramps_id() :
+                            associate = id1
+                            active = id2
+                    if associate:
+                        random.seed(associate.get_gramps_id())
+                        side = self._get_chromosome_side(active, associate)
                     else:
-                        MatchPerson = None
-                    
-                    associate=None
-                    active=None
-                    do_non_person = True
-                    if dnamatch and dnamatch.get_segment_list() and SubjectPerson:
-                        id1 = SubjectPerson
-                        id2 = MatchPerson
-                        if MatchPerson:
-                            if selected.get_gramps_id() == id1.get_gramps_id() :
-                                associate = id2
-                                active = id1
-                            elif selected.get_gramps_id() == id2.get_gramps_id() :
-                                associate = id1
-                                active = id2
-                        if associate:
-                            random.seed(associate.get_gramps_id())
-                            side = self._get_chromosome_side(active, associate)
-                        else:
-                            random.seed(dnamatch.get_gramps_id())
-                            side = 'U'
-                            do_non_person = self.show_all_matches
-                        rgb_color = [random.random(),random.random(),random.random()]
-    # Get DNASegments from DNAMatch
-                        if do_non_person: 
-                            for segment in dnamatch.get_segment_list():
-                                note = ""
-                                self._write_DNASegments_chromo(segment, side, rgb_color, associate, note, segmap, Match_Account_Name)
-
-            if len(segmap.segments) > 0:
+                        random.seed(dnamatch.get_gramps_id())
+                        side = 'U'
+                        do_non_person = self.show_all_matches
+                    rgb_color = [random.random(),random.random(),random.random()]
+# Get DNASegments from DNAMatch
+                    if do_non_person: 
+                        for segment in dnamatch.get_segment_list():
+                            note = ""
+                            self._write_DNASegments_chromo(segment, side, rgb_color, associate, note, segmap, Match_Account_Name)
+        if len(segmap.segments) > 0:
 #       Potentially sort the segments here to change the draw order
-                segmentsSorted = sorted(segmap.segments,reverse=True, key=itemgetter(4))
-                segmap.segments = segmentsSorted
-                segmap.show()
-                self.vbox.pack_start(segmap, True, True, 0)
+            segmentsSorted = sorted(segmap.segments,reverse=True, key=itemgetter(4))
+            segmap.segments = segmentsSorted
+            segmap.show()
+            self.vbox.pack_start(segmap, True, True, 0)
 
 #
 # Determine whether paternal or maternal side of chromosome
@@ -331,7 +332,7 @@ class DNASegmentMap(Gramplet):
 #
 # CHANGE from phase to origin due to Data Model change
 #
-        phase = segment.get_phase()
+        phase = segment.get_origin()
 # Override the maternal/paternal flag if phase specified in Segment and Tree does not find a relationship
         updated_side = side
         if side == 'U':

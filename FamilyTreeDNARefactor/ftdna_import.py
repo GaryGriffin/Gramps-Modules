@@ -37,7 +37,7 @@ from gi.repository import GObject
 from gramps.gui.plug import tool
 from gramps.gen.display.name import displayer as _nd
 from gramps.gen.plug import Gramplet
-from gramps.gen.lib import DNATest, DNAMatch, DNASegment
+from gramps.gen.lib import DNATest, DNAMatch, DNASegment, PredictedRelationship
 from gramps.gui.managedwindow import ManagedWindow
 from gramps.gen.db import DbTxn
 from gramps.gen.lib import Attribute, Note, Citation, PersonRef, NoteType, Source
@@ -335,7 +335,11 @@ class FamilyFinder(tool.Tool,ManagedWindow):
             match_dnamatch.set_shared_cm(float(test_match[4]))
             match_dnamatch.set_largest_segment_cm(float(test_match[5]))
             match_dnamatch.add_citation(cit.handle)
-            if not assoc: match_dnamatch.set_predicted_relationship(test_match[7])
+            if not assoc:
+                relationShip = PredictedRelationship()
+                relationShip.set_description(test_match[7])
+                match_dnamatch.add_predicted_relationship(relationShip)
+#                match_dnamatch.set_predicted_relationship(test_match[7])
             self.__create_segments(test_match[0],match_dnamatch, test_match[9])
             self._add_DNAMatch(match_dnamatch)
             count += 1
@@ -368,9 +372,9 @@ class FamilyFinder(tool.Tool,ManagedWindow):
                 segment.set_snp_count(int(seg[5]))
                 dnamatch.add_segment(segment)
                 if bucket == "Maternal": 
-                    segment.set_phase(2)
+                    segment.set_origin(2)
                 elif bucket == "Paternal":
-                    segment.set_phase(3)
+                    segment.set_origin(3)
                 seg_count += 1
         dnamatch.set_segment_count(seg_count)
 
@@ -453,9 +457,10 @@ class FamilyFinder(tool.Tool,ManagedWindow):
             body_line = False
             for row in reader:
                 if  body_line:
-                    concat_name = ' '.join([row[1],row[2],row[3]])
+                    new_row = [s.strip() for s in row]
+                    concat_name = ' '.join([new_row[1],new_row[2],new_row[3]])
                     new_name = re.sub("\\s{2,}", ' ', concat_name)
-                    self.__FFdata.append([new_name.strip(),row[10],row[11],row[12],row[6],row[7], row[15], row[5], row[0], row[13]])
+                    self.__FFdata.append([new_name.strip(),new_row[10],new_row[11],new_row[12],new_row[6],new_row[7], new_row[15], new_row[5], new_row[0], new_row[13]])
                 body_line = True
         self.__FFdata.sort()
 
@@ -474,9 +479,11 @@ class FamilyFinder(tool.Tool,ManagedWindow):
             body_line = False
             for row in reader:
                 if body_line:
-                    concat_name = row[0].strip()
-                    new_name = re.sub("\\s{2,}", ' ', concat_name)
-                    self.__Segment.append((new_name, row[1], row[2], row[3], row[4], row[5]))
+                    if row : 
+                        new_row = [s.strip() for s in row]
+                        concat_name = new_row[0].strip()
+                        new_name = re.sub("\\s{2,}", ' ', concat_name)
+                        self.__Segment.append((new_name, new_row[1], new_row[2], new_row[3], new_row[4], new_row[5]))
                 body_line = True
         self.__Segment.sort()
 
