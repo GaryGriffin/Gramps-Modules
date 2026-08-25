@@ -336,10 +336,10 @@ class FamilyFinder(tool.Tool,ManagedWindow):
             match_dnamatch.set_largest_segment_cm(float(test_match[5]))
             match_dnamatch.add_citation(cit.handle)
             if not assoc:
-                relationShip = PredictedRelationship()
-                relationShip.set_description(test_match[7])
-                match_dnamatch.add_predicted_relationship(relationShip)
-#                match_dnamatch.set_predicted_relationship(test_match[7])
+                for rel in test_match[7].split(','):
+                    relationShip = PredictedRelationship()
+                    relationShip.set_description(rel)
+                    match_dnamatch.add_predicted_relationship(relationShip)
             self.__create_segments(test_match[0],match_dnamatch, test_match[9])
             self._add_DNAMatch(match_dnamatch)
             count += 1

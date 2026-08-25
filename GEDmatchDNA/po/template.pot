@@ -1,0 +1,137 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-24 19:47-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: GEDmatchDNA/GEDmatch_import.gpr.py:4
+msgid "GEDmatch DNA"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.gpr.py:5
+msgid "Tool to import DNA data from GEDmatch"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:77
+msgid "GEDmatch Tool"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:104
+msgid "Enter GEDmatch list Filename:"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:109
+msgid "Enter GEDmatch Chromosome Segment Filename:"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:120
+msgid "Shared Citation ID :"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:135
+msgid "Active Person : "
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:138
+msgid "Import as DNAMatch"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:145
+msgid "Min cM for DNA Match import : "
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:151
+msgid "Include duplicate matches"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:168
+msgid "Import"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:169
+msgid "Import data from list files"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:172
+msgid "Close"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:173
+msgid "Close the Family Finder Tool"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:176
+msgid "Help"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:177
+msgid "Read Help manual"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:211 GEDmatchDNA/GEDmatch_import.py:215
+#: GEDmatchDNA/GEDmatch_import.py:220 GEDmatchDNA/GEDmatch_import.py:224
+#: GEDmatchDNA/GEDmatch_import.py:260
+msgid "GEDmatch DNA Import"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:212
+msgid "No GEDmatch list File specified"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:216
+msgid "No Segment File specified"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:221
+#, python-brace-format
+msgid "{} DNAMatches created. \n"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:225
+msgid "Nothing Imported from FTdna files."
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:261
+msgid "Please wait, processing segment data..."
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:384
+#, python-format
+msgid "Add DNA Test (%s)"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:389
+#, python-format
+msgid "Edit DNA Test (%s)"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:398
+#, python-format
+msgid "Add DNA Match (%s)"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:403
+#, python-format
+msgid "Edit DNA Match (%s)"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:483
+msgid "Create Source Citation for DNA Data"
+msgstr ""
+
+#: GEDmatchDNA/GEDmatch_import.py:488
+msgid "Create Citation for DNA Data"
+msgstr ""

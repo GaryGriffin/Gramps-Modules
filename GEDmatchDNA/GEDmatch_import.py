@@ -310,10 +310,11 @@ class GEDmatchFinder(tool.Tool,ManagedWindow):
             match_dnamatch.set_subject_test_handle(active_dnatest.get_handle())
             match_dnamatch.set_shared_cm(float(test_match[4]))
             match_dnamatch.set_largest_segment_cm(float(test_match[3]))
-            relationShip = PredictedRelationship()
-            relationShip.set_subject_mrca_gens(float(test_match[5]))
-            match_dnamatch.add_predicted_relationship(relationShip)
-#            match_dnamatch.set_predicted_generations(float(test_match[5]))
+#  IGNORE GEDMatch generations as it is not useful and if included without 
+#       description gives 'unnamed' in view. Description is not in GEDMatch download.
+#            relationShip = PredictedRelationship()
+#            relationShip.set_subject_mrca_gens(float(test_match[5]))
+#            match_dnamatch.add_predicted_relationship(relationShip)
             match_dnamatch.add_citation(cit.handle)
             self.__create_segments(test_match[0], match_dnamatch, match_dnatest)
             self._add_DNATest(match_dnatest)

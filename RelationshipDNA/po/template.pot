@@ -1,0 +1,136 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-12-05 10:57-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: RelationshipDNA/relationshipDNA.py:110
+#, python-brace-format
+msgid "DNA overlap with relationships for {} sorted by cM"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:118
+msgid "cM"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:124
+msgid "Name"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:130
+msgid "Ancestry ID / DNA kit"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:136
+msgid "Relationship"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:142
+msgid "Common Ancestor"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:175
+#, python-format
+msgid "%s"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:179
+#, python-format
+msgid "%(ancestor1)s and %(ancestor2)s"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:321
+msgid "The style used for the title."
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:331
+#: RelationshipDNA/relationshipDNA.py:342
+msgid "The basic style used for the text display."
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:353
+msgid "The basic style used for table headings."
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:372
+msgid "Report Options"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:374
+msgid "Print gramps ID"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:375
+msgid "Include gramps ID with the name"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:377
+msgid "Print segment flag"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:378
+msgid "Flag whether segment info in Association Note"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:380
+msgid "Print Kit Info"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:381
+msgid "Print Ancestry ID and GEDmatch kit (if available)"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:388
+msgid "Report Stats"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:389
+msgid "Show Date"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:390
+msgid "Show Date at end of report"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:392
+msgid "Show Gramps Version"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:393
+msgid "Show Gramps Version at end of report"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:395
+msgid "Show Gramps Tree"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.py:396
+msgid "Show Gramps Tree name at end of report"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.gpr.py:3
+msgid "DNA Relationship Report"
+msgstr ""
+
+#: RelationshipDNA/relationshipDNA.gpr.py:4
+msgid ""
+"Produces a relationship report for all Persons with cM overlap with the "
+"active person. For each person who has a DNA overlap (as quantified in cM), "
+"create cM association for the main person and specify the associated person. "
+"Add a Note to the Association with the numeric value of the cM match between "
+"the two people. Report will display the associated person Ancestry ID "
+"attribute if present (person attribute of Ancestry ID)."
+msgstr ""

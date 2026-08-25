@@ -1,0 +1,188 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-24 19:47-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: FamilyTreeDNARefactor/ftdna_import.py:77
+msgid "Family Finder Tool"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:104
+msgid "Enter FTDNA Family Finder Filename:"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:109
+msgid "Enter FTDNA Chromosome Segment Filename:"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:112
+msgid "Import Haplogroups as Attribute"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:128
+msgid "FTDNA Note string :"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:137
+msgid "Shared Citation ID :"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:152
+msgid "Active Person : "
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:154
+msgid "Import as Association Note"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:161
+msgid "Import as DNAMatch"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:168
+msgid "Min cM for DNA Match import : "
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:174
+msgid "Include duplicate matches"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:195
+msgid "Import"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:196
+msgid "Import data from Family Finder files"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:199
+msgid "Close"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:200
+msgid "Close the Family Finder Tool"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:203
+msgid "Help"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:204
+msgid "Read Help manual"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:259
+#: FamilyTreeDNARefactor/ftdna_import.py:263
+#: FamilyTreeDNARefactor/ftdna_import.py:268
+#: FamilyTreeDNARefactor/ftdna_import.py:272
+#: FamilyTreeDNARefactor/ftdna_import.py:277
+#: FamilyTreeDNARefactor/ftdna_import.py:281
+#: FamilyTreeDNARefactor/ftdna_import.py:308
+msgid "FamilyTree DNA Import"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:260
+msgid "No Family Finder File specified"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:264
+msgid "No Segment File specified"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:269
+#, python-brace-format
+msgid ""
+"{} Associations with DNA data created. {} haplogroup Attributes created \n"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:273
+msgid "Nothing Imported from FTdna files. No haplogroup Attributes created."
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:278
+#, python-brace-format
+msgid "{} DNAMatches created. {} haplogroup Attributes created \n"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:282
+msgid "Nothing Imported from FTdna files."
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:309
+msgid "Please wait, processing segment data..."
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:398
+#, python-format
+msgid "Add DNA Test (%s)"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:403
+#, python-format
+msgid "Edit DNA Test (%s)"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:412
+#, python-format
+msgid "Add DNA Match (%s)"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:417
+#, python-format
+msgid "Edit DNA Match (%s)"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:516
+#, python-format
+msgid "Add %s haplogroup attribute"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:561
+#, python-format
+msgid "Add %s DNA Association"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:578
+#, python-format
+msgid "Create Note for %s DNA Association"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:580
+#, python-format
+msgid "Add Note to %s DNA Association"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:593
+#, python-format
+msgid "Add Citation to %s DNA Association"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:604
+msgid "Create Source Citation for DNA Data"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.py:609
+msgid "Create Citation for DNA Data"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.gpr.py:4
+msgid "FamilyTree DNA"
+msgstr ""
+
+#: FamilyTreeDNARefactor/ftdna_import.gpr.py:5
+msgid "Tool to import FamilyFinder DNA data from Family Tree"
+msgstr ""
