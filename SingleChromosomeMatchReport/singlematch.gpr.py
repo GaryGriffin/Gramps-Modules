@@ -1,0 +1,16 @@
+register(REPORT,
+    id   = 'single chromosom matching report',
+    name = _('Chromosome Matching Report'),
+    description = _("Produces a list of all DNA tests with a match to the Active Person on a specified chromosome."),
+    version = '0.1.0',
+    gramps_target_version = '6.1',
+    status = STABLE,
+    fname = 'singlematch.py',
+    authors = ["Gary Griffin"],
+    authors_email = ["genealogy@garygriffin.net"],
+    category = CATEGORY_TEXT,
+    reportclass = 'SingleMatchReport',
+    optionclass = 'SingleMatchReportOptions',
+    report_modes = [REPORT_MODE_GUI, REPORT_MODE_BKI, REPORT_MODE_CLI],
+    require_active = True
+    )

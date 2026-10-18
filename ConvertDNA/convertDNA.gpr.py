@@ -31,7 +31,7 @@ register(
         "Tool to migrate Notes in Associations to DNA Data Model"
     ),
     version = '1.0.0',
-    gramps_target_version="6.0",
+    gramps_target_version="6.1",
     status=STABLE,
     fname="convertDNA.py",
     category=TOOL_DBPROC,

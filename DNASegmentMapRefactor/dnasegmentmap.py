@@ -111,6 +111,7 @@ class DNASegmentMap(Gramplet):
         self.show_associate_id = False
         self.show_all_matches = False
         self.min_cM_threshold = 0
+        self.max_cM_threshold = 1500
 
     def build_options(self):
         """Build the configuration options"""
@@ -123,6 +124,7 @@ class DNASegmentMap(Gramplet):
         self.add_option( BooleanOption(_("Show Associate ID"), self.show_associate_id))
         self.add_option( BooleanOption(_("Include not in existing tree"), self.show_all_matches))
         self.add_option( NumberOption(_("Min cM threshold"), self.min_cM_threshold, 0, 3000))
+        self.add_option( NumberOption(_("Max cM threshold"), self.max_cM_threshold, 0, 3000))
 
     def save_options(self):
         """Save gramplet configuration data"""
@@ -131,21 +133,23 @@ class DNASegmentMap(Gramplet):
         self.show_associate_id = self.get_option(_("Show Associate ID")).get_value()
         self.show_all_matches = self.get_option(_("Include not in existing tree")).get_value()
         self.min_cM_threshold = self.get_option(_("Min cM threshold")).get_value()
+        self.max_cM_threshold = self.get_option(_("Max cM threshold")).get_value()
 
     def save_update_options(self, obj):
         """Save a gramplet's options to file"""
         self.save_options()
-        self.gui.data = [self.source_mode, self.show_centromere, self.show_associate_id, self.show_all_matches, self.min_cM_threshold]
+        self.gui.data = [self.source_mode, self.show_centromere, self.show_associate_id, self.show_all_matches, self.min_cM_threshold, self.max_cM_threshold]
         self.update()
 
     def on_load(self):
         """Load stored configuration data"""
-        if len(self.gui.data) == 5:
+        if len(self.gui.data) == 6:
             self.source_mode = self.gui.data[0]
             self.show_centromere = self.gui.data[1]
             self.show_associate_id = self.gui.data[2]
             self.show_all_matches = self.gui.data[3]
             self.min_cM_threshold = int(self.gui.data[4])
+            self.max_cM_threshold = int(self.gui.data[5])
 
     def db_changed(self):
         self.connect(self.dbstate.db, 'person-add', self.update)
@@ -259,7 +263,7 @@ class DNASegmentMap(Gramplet):
                 active=None
                 do_non_person = True
 # If the DNAMatch has a segment list and the shared cM is greater than threshold, draw it
-                if dnamatch and dnamatch.get_segment_list() and SubjectPerson and (self.min_cM_threshold < dnamatch.get_shared_cm()):
+                if dnamatch and dnamatch.get_segment_list() and SubjectPerson and (self.min_cM_threshold < dnamatch.get_shared_cm())  and (self.max_cM_threshold > dnamatch.get_shared_cm()):
                     id1 = SubjectPerson
                     id2 = MatchPerson
                     if MatchPerson:

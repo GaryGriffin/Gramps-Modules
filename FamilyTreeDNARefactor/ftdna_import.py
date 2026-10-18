@@ -334,11 +334,12 @@ class FamilyFinder(tool.Tool,ManagedWindow):
             match_dnamatch.set_match_test_handle(match_dnatest.get_handle())
             match_dnamatch.set_shared_cm(float(test_match[4]))
             match_dnamatch.set_largest_segment_cm(float(test_match[5]))
+            match_dnamatch.set_provider("FTDNA")
             match_dnamatch.add_citation(cit.handle)
             if not assoc:
                 for rel in test_match[7].split(','):
                     relationShip = PredictedRelationship()
-                    relationShip.set_description(rel)
+                    relationShip.set_description(rel.strip())
                     match_dnamatch.add_predicted_relationship(relationShip)
             self.__create_segments(test_match[0],match_dnamatch, test_match[9])
             self._add_DNAMatch(match_dnamatch)
@@ -355,7 +356,10 @@ class FamilyFinder(tool.Tool,ManagedWindow):
         match_dnatest = DNATest()
         match_dnatest.set_test_type("Autosomal")
         match_dnatest.set_account_name(test_match[8])
-        if test_match[6] == "No": match_dnatest.set_provider("FTDNA")
+        if test_match[6] == "No": 
+            match_dnatest.set_provider("FTDNA")
+        else:
+            match_dnatest.set_provider("Unknown")
         match_dnatest.set_y_haplogroup(test_match[1])
         match_dnatest.set_mt_haplogroup(test_match[2])
         return match_dnatest

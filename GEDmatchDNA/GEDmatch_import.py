@@ -310,6 +310,7 @@ class GEDmatchFinder(tool.Tool,ManagedWindow):
             match_dnamatch.set_subject_test_handle(active_dnatest.get_handle())
             match_dnamatch.set_shared_cm(float(test_match[4]))
             match_dnamatch.set_largest_segment_cm(float(test_match[3]))
+            match_dnamatch.set_provider("GEDmatch")
 #  IGNORE GEDMatch generations as it is not useful and if included without 
 #       description gives 'unnamed' in view. Description is not in GEDMatch download.
 #            relationShip = PredictedRelationship()
@@ -334,7 +335,7 @@ class GEDmatchFinder(tool.Tool,ManagedWindow):
         match_dnatest.set_test_type("Autosomal")
         match_dnatest.set_account_name(test_match[1])
         match_dnatest.set_kit_id(test_match[0])
-        ProviderString = ""
+        ProviderString = "Unknown"
         test_company = test_match[10].strip()
         if   test_company.startswith("Ancestry"): ProviderString = "AncestryDNA"
         elif test_company.startswith("23"):       ProviderString = "23andMe"

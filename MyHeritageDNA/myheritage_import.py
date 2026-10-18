@@ -303,6 +303,7 @@ class MyHeritageFinder(tool.Tool,ManagedWindow):
             match_dnamatch = DNAMatch()
             match_dnamatch.set_subject_test_handle(active_dnatest.get_handle())
             match_dnamatch.set_match_test_handle(match_dnatest.get_handle())
+            match_dnamatch.set_provider("MyHeritage")
             relationShip = PredictedRelationship()
             relationShip.set_description(test_match[2])
             match_dnamatch.add_predicted_relationship(relationShip)
@@ -326,6 +327,7 @@ class MyHeritageFinder(tool.Tool,ManagedWindow):
     def __make_dnatest(self,test_match):
         match_dnatest = DNATest()
         match_dnatest.set_test_type("Autosomal")
+        match_dnatest.set_provider("Unknown")
         match_dnatest.set_account_name(test_match[1])
         match_dnatest.set_kit_id(test_match[0])
         return match_dnatest
