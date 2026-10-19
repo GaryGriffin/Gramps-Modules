@@ -21,9 +21,6 @@
 
 """Single Chromosome Match Report"""
 #
-# This is a sample report that can be used as a template. It includes many functions that a report may desire - filtered lists, options, and footers. 
-# This is more documented than most code to assist in learning
-#
 #
 #------------------------------------------------------------------------
 #
@@ -33,6 +30,8 @@
 import math
 import csv
 import io
+import time
+from operator import itemgetter
 
 #------------------------------------------------------------------------
 #
@@ -57,8 +56,7 @@ from gramps.gen.proxy import CacheProxyDb
 from gramps.gen.relationship import get_relationship_calculator
 
 from gramps.gen.const import (PROGRAM_NAME, VERSION)
-import time
-from operator import itemgetter
+
 #------------------------------------------------------------------------
 #
 # Constants
@@ -69,7 +67,7 @@ EMPTY_ENTRY = "_____________"
 # List of output formats
 #
 STYLE_ENTRY = 'Table format','CSV format'
-CHROMO_ENTRY = '1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X'
+CHROMO_ENTRY = '1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','X', 'All'
 HEADERS = ['Match ID', 'Person ID', 'Rel', 'Person', 'Start cM', 'End cM']
 
 #------------------------------------------------------------------------
@@ -95,37 +93,45 @@ class SingleMatchReport(Report):
         pid = mgobn('pid')
         self.__min_cm = mgobn('min_cm')
         self.__max_cm = mgobn('max_cm')
-        self.__chromosome = mgobn("chromosome")
+        self.__chromo = mgobn("chromosome")
         self.center_person = self.database.get_person_from_gramps_id(pid)
         if self.center_person is None:
             raise ReportError(_("Person %s is not in the Database") % pid)
         self.database = CacheProxyDb(self.database)
         self.relationship = get_relationship_calculator(glocale)
 #
-# Initialize the footer
-#
-        self.__init_meta(options_class)
-#
 # Overarrching Report writer. 
 #
     def write_report(self):
+        if self.__chromo == "All":
+            for chromo in CHROMO_ENTRY[:-1]:
+                self.__chromosome = chromo
+                self.__write_single_report()
+                self.doc.page_break()
+        else:
+            self.__chromosome = self.__chromo
+            self.__write_single_report()
+
+    def __write_single_report(self):
         reportRows = self.__generate_rows()
-#
-# Select output format based on user selection
-#
         if self.style == STYLE_ENTRY[0]:
             self.__write_report_table(reportRows)
         if self.style == STYLE_ENTRY[1]:
             self.__write_report_csv(reportRows)
-#
-# The report prefix for this report is Single. This must be unique among all reports if it is included in a book. 
-#
+
     def __write_report_table(self,reportRowsSorted):
         self.doc.start_paragraph("Single-Attribute-Title")
         title = _("Chromosome Report")
         mark = IndexMark(title, INDEX_TYPE_TOC,1)
         self.doc.write_text(_(self.titletext),mark)
         self.doc.end_paragraph()
+# Add Chromosome subtitle
+        self.doc.start_paragraph("Single-Attribute-SubTitle")
+        subtitle = _("Chromosome ") + self.__chromosome
+        mark = IndexMark(title, INDEX_TYPE_TOC,1)
+        self.doc.write_text(_(subtitle),mark)
+        self.doc.end_paragraph()
+# Headers
         self.doc.start_table('Attributes','Single-Attribute-Table')
         self.doc.start_row()
         for i in range(len(HEADERS)):
@@ -141,7 +147,7 @@ class SingleMatchReport(Report):
 # ITERATE ROW HERE
         for reportRow in reportRowsSorted :
             self.doc.start_row()
-            for i in range(len(reportRow)):
+            for i in range(len(HEADERS)): # Change from reportRow to HEADERS to avoid printing chromosome number
                 self.doc.start_cell('Single-Attribute-TableCell')
                 if i < 4: 
                     self.doc.start_paragraph('Single-Attribute-Normal')
@@ -152,12 +158,11 @@ class SingleMatchReport(Report):
                 self.doc.end_cell()
             self.doc.end_row()
         self.doc.end_table()
-        self.__write_meta()
 
     def __write_report_csv(self, reportRowsSorted):
         output = io.StringIO()
         writer = csv.writer(output)
-        writer.writerow(HEADERS)
+#        writer.writerow(HEADERS)
 # ITERATE ROW HERE
         for reportRow in reportRowsSorted :
             writer.writerow(reportRow)
@@ -167,9 +172,6 @@ class SingleMatchReport(Report):
 
     def __generate_rows(self) :
         reportRows = []
-#
-#    TRAVERSE Test LIST TO CREATE ROWS
-#
         active_handle = self.center_person.get_handle()
         active_test_handles = self._db.find_backlink_handles(active_handle, ["DNATest"])
         for class_name_test, active_test_handle in active_test_handles:
@@ -210,38 +212,14 @@ class SingleMatchReport(Report):
                             match_id = active_match.get_gramps_id()
                             start_cM = seg.get_start_bp()
                             end_cM = seg.get_end_bp()
-                            reportRows.append((match_id, person_id, rel, person_name, start_cM, end_cM))
-                            
+                            reportRows.append((match_id, person_id, rel, person_name, start_cM, end_cM, chromosome))
+
         reportRowsSorted = sorted (reportRows, reverse = False, key=itemgetter(4,5))
         return reportRowsSorted
 
-    def __init_meta(self, options_class):
-#
-#    Footer Characteristics user-selection
-#
-        mgobn = lambda name:options_class.menu.get_option_by_name(name).get_value()
-
-        self.footer_date = mgobn('footerdate')
-        self.footer_version = mgobn('footerversion')
-        self.footer_tree = mgobn('footertree')
-#
-# output footer if selected
-#
-    def __write_meta(self):
-        self.doc.start_paragraph('Single-Attribute-Normal')
-        if self.footer_date:
-            self.doc.write_text("Todays Date : %s \n" % time.ctime())
-        if self.footer_version:
-            self.doc.write_text("Gramps Version: %s \n" % VERSION)
-        if self.footer_tree:
-            self.doc.write_text("Gramps Tree: %s \n" % self.database.get_dbname())
-        self.doc.end_paragraph()
-
-
-
 #------------------------------------------------------------------------
 #
-# Sample Report Options - this class must be the same as specified in the .gpr.py file
+# Single Report Options - this class must be the same as specified in the .gpr.py file
 #
 #------------------------------------------------------------------------
 class SingleMatchReportOptions(MenuReportOptions):
@@ -261,9 +239,7 @@ class SingleMatchReportOptions(MenuReportOptions):
         self.__sel3_option = None
         self.__sel4_option = None
         self.__titletext = None
-        self.__footer_date = None
-        self.__footer_version = None
-        self.__footer_tree = None
+
         MenuReportOptions.__init__(self, name, dbase)
 
 
@@ -303,11 +279,9 @@ class SingleMatchReportOptions(MenuReportOptions):
         menu.add_option(category_name, "style",self.__sel2_option)
 
         category_name = _("Table Options")
-        self.__titletext = StringOption(_("Title text"),_("Title text"))
+        self.__titletext = StringOption(_("Chromosome Report"),_("Chromosome Report"))
         self.__titletext.set_help(_("Title of report"))
         menu.add_option(category_name, "titletext",self.__titletext)
-
-        self.__add_menu_meta(menu)
 
 #
 # The style sheet for the attributes
@@ -333,6 +307,16 @@ class SingleMatchReportOptions(MenuReportOptions):
         p.set_alignment(PARA_ALIGN_CENTER)
         p.set_description(_("The style used for the title."))
         default_style.add_paragraph_style("Single-Attribute-Title", p)
+
+        f = FontStyle()
+        f.set_size(10)
+        f.set_type_face(FONT_SANS_SERIF)
+        f.set_bold(1)
+        p = ParagraphStyle()
+        p.set_font(f)
+        p.set_alignment(PARA_ALIGN_CENTER)
+        p.set_description(_("The style used for the chromosome subtitle."))
+        default_style.add_paragraph_style("Single-Attribute-SubTitle", p)
 
         font = FontStyle()
         font.set_size(my_font_size)
@@ -391,15 +375,3 @@ class SingleMatchReportOptions(MenuReportOptions):
         table.set_column_width(4,15)
         table.set_column_width(5,15)
         default_style.add_table_style('Single-Attribute-Table',table)
-
-    def __add_menu_meta(self,menu):
-        category_name = _("Report Stats")
-        self.__footer_date = BooleanOption(_("Show Date"),False)
-        self.__footer_date.set_help(_("Show Date at end of report"))
-        menu.add_option(category_name,"footerdate", self.__footer_date)
-        self.__footer_version = BooleanOption (_("Show Gramps Version"), False)
-        self.__footer_version.set_help(_("Show Gramps Version at end of report"))
-        menu.add_option(category_name,"footerversion", self.__footer_version)
-        self.__footer_tree = BooleanOption(_("Show Gramps Tree"), False)
-        self.__footer_tree.set_help(_("Show Gramps Tree name at end of report"))
-        menu.add_option(category_name,"footertree", self.__footer_tree)

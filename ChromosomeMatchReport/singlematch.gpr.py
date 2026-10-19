@@ -1,5 +1,5 @@
 register(REPORT,
-    id   = 'single chromosom matching report',
+    id   = 'ChromosomeMatchingReport',
     name = _('Chromosome Matching Report'),
     description = _("Produces a list of all DNA tests with a match to the Active Person on a specified chromosome."),
     version = '0.1.0',
